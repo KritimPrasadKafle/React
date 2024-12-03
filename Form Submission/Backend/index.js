@@ -12,10 +12,10 @@ require('dotenv').config()
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: 'http://localhost:5173', // Allow requests from your frontend
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
-  credentials: true, // Include cookies if needed
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 }));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -35,7 +35,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-//ZOD schema for validation
+
 const formValidationSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
@@ -56,7 +56,6 @@ app.post('/submit', upload.single('resume'), async (req, res) => {
     console.log("File:", req.file);
 
 
-    // Validate incoming data
     const validatedData = formValidationSchema.safeParse({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
@@ -85,13 +84,11 @@ app.post('/submit', upload.single('resume'), async (req, res) => {
       url: req.body.url,
       selectedOption: req.body.selectedOption,
       about: req.body.about,
-      resume: resumeUrl,  // Save the resume file path
+      resume: resumeUrl,
     };
 
-    // Save the data to the database
     const savedData = await Form.create(formData);
 
-    // Respond with the saved data
     res.status(200).json({ success: true, data: savedData });
   } catch (err) {
     console.error(err);
