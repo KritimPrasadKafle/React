@@ -2,6 +2,7 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import axios from "axios";
 
 function App() {
   const [firstName, setFirstName] = useState("");
@@ -20,9 +21,34 @@ function App() {
     useState("");
   const [about, setAbout] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-  }
+
+    const formData = new FormData();
+    formData.append("firstName", firstName);
+    formData.append("lastName", lastName);
+    formData.append("email", email);
+    formData.append("contact", contact);
+    formData.append("gender", gender);
+    formData.append("subjects", JSON.stringify(Object.keys(subjects).filter((sub) => subjects[sub])));
+    formData.append("resume", resume); // Assumes `resume` is a File object
+    formData.append("url", url);
+    formData.append("selectedOption", selectedOption);
+    formData.append("about", about);
+
+    try {
+      const response = await axios.post("http://localhost:3000/submit", formData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("Form submitted successfully:", response.data);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
+  };
+
+
   const handleSubjectChange = (sub) => {
     setSubjects((prev) => ({ ...prev, [sub]: !prev[sub] }));
   }
@@ -47,7 +73,7 @@ function App() {
     <div className="App">
       <h1>Form in React</h1>
       <fieldset>
-        <form action="#" method="get">
+        <form onSubmit={handleSubmit} encType="multipart/form-data">
           <label for="firstname">
             First Name*
           </label>
